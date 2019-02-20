@@ -1,4 +1,5 @@
-import { useQuery } from 'graphql-hooks'
+import React, { useContext, useState } from 'react'
+import { useQuery, ClientContext } from 'graphql-hooks'
 import ErrorMessage from './error-message'
 import PostUpvoter from './post-upvoter'
 
@@ -17,17 +18,15 @@ export const allPostsQuery = `
   }
 `
 
-export const allPostsQueryVars = {
-  skip: 0,
-  first: 10
-}
-const fetchMore = () => {}
 export default function PostList () {
-  const { loading, error, data } = useQuery(allPostsQuery, {
-    variables: allPostsQueryVars
+  const [listSize, setListSize] = useState(10)
+
+  const { loading, error, data, refetch, ...rest } = useQuery(allPostsQuery, {
+    variables: { skip: 0, first: listSize }
   })
+
   if (error) return <ErrorMessage message='Error loading posts.' />
-  if (loading) return <div>Loading</div>
+  if (loading && !data) return <div>Loading</div>
 
   const { allPosts, _allPostsMeta } = data
 
@@ -40,15 +39,15 @@ export default function PostList () {
             <div>
               <span>{index + 1}. </span>
               <a href={post.url}>{post.title}</a>
-              <PostUpvoter id={post.id} votes={post.votes} />
+              <PostUpvoter id={post.id} votes={post.votes} onUpdate={refetch} />
             </div>
           </li>
         ))}
       </ul>
       {areMorePosts ? (
-        <button onClick={() => loadMorePosts(allPosts, fetchMore)}>
+        <button onClick={() => setListSize(listSize + 10)}>
           {' '}
-          {loading ? 'Loading...' : 'Show More'}{' '}
+          {loading && !data ? 'Loading...' : 'Show More'}{' '}
         </button>
       ) : (
         ''
@@ -94,5 +93,3 @@ export default function PostList () {
     </section>
   )
 }
-
-function loadMorePosts () {}

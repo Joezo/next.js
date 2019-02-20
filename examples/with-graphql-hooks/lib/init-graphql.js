@@ -6,13 +6,8 @@ let graphQLClient = null
 
 function create (initialState = {}) {
   return new GraphQLClient({
-    connectToDevTools: process.browser,
-    ssrMode: !process.browser, // Disables forceFetch on the server (so queries are only run once)
+    ssrMode: !process.browser,
     url: 'https://api.graph.cool/simple/v1/cixmkt2ul01q00122mksg82pn',
-    // link: new HttpLink({
-    //   uri: 'https://api.graph.cool/simple/v1/cixmkt2ul01q00122mksg82pn', // Server URL (must be absolute)
-    //   credentials: 'same-origin' // Additional fetch() options like `credentials` or `headers`
-    // }),
     cache: memCache({ initialState }),
     fetch: process.browser ? fetch.bind() : unfetch // eslint-disable-line
   })

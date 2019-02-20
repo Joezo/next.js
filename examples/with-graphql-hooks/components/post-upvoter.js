@@ -11,11 +11,22 @@ const UPDATE_POST = `
   }
 `
 
-export default function PostUpvoter ({ votes, id }) {
+export default function PostUpvoter ({ votes, id, onUpdate }) {
   const [updatePost, state] = useMutation(UPDATE_POST)
-  console.log('state', state)
+
   return (
-    <button onClick={() => upvotePost(votes, id, updatePost)}>
+    <button
+      onClick={async () => {
+        const result = await updatePost({
+          variables: {
+            id,
+            votes: votes + 1
+          }
+        })
+
+        onUpdate && onUpdate(result)
+      }}
+    >
       {votes}
       <style jsx>{`
         button {
@@ -39,13 +50,4 @@ export default function PostUpvoter ({ votes, id }) {
       `}</style>
     </button>
   )
-}
-
-function upvotePost (votes, id, updatePost) {
-  updatePost({
-    variables: {
-      id,
-      votes: votes + 1
-    }
-  })
 }
