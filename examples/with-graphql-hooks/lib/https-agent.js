@@ -1,4 +1,4 @@
-let agent = process.browser ? null : {}
+let agent = null
 if (!process.browser) {
   const https = require('https')
   agent = new https.Agent({
